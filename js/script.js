@@ -29,14 +29,69 @@ function getListTeams() {
                     <p>Berdiri: ${team.founded} <br>
                         Markas: ${team.venue}
                     </p>
-                    <a href="#modal1" class="secondary-content modal-trigger"><i class="material-icons">info</i></a>
+                    <a href="#" id="getId${team.id}" data-id="${team.id}" data-target="modal1" class="secondary-content modal-trigger"><i class="material-icons">info</i></a>
                 </li>
-                `
+                `;
             });
             contents.innerHTML = '<ul class="collection">' + teams + '</ul>'
+            resJson.teams.forEach(team => {
+                document.getElementById(`getId${team.id}`).addEventListener('click', function () {
+                    showTeamInfo(this.dataset.id);
+                });
+            });
+
         }).catch(err => {
             console.error(err);
         })
+}
+
+function showTeamInfo(id) {
+    let url = baseUrl + "teams/" + id;
+    fetch(url, fetchHeader)
+        .then(response => response.json())
+        .then(restJson => {
+            console.log(restJson)
+            let teams = "";
+            teams += `
+            <div class="container">
+            <h3 style="text-align: center;">${restJson.name}</h3>
+            <div class="card-image center-align">
+                    <img src="${restJson.crestUrl}" class="circle">
+                </div>
+            <div class="col s4">
+            <p style="font-weight: bold;">Nama Panjang</p>
+            <p style="font-weight: bold;">Asal</p>
+            <p style="font-weight: bold;">Lokasi Stadion</p>
+            <p style="font-weight: bold;">Jumlah Pemain</p>
+            <p style="font-weight: bold;">Website</p>
+            <p style="font-weight: bold;">Email</p>
+            <p style="font-weight: bold;">No. Telp</p>
+            <p style="font-weight: bold;">Warna Club</p>
+            </div>
+            <div class="col s1">
+            <p>:</p>
+            <p>:</p>
+            <p>:</p>
+            <p>:</p>
+            <p>:</p>
+            <p>:</p>
+            <p>:</p>
+            <p>:</p>
+            </div>
+            <div class="col s7">
+                <p>${restJson.shortName}</p>
+                <p>${restJson.address}</p>
+                <p>${restJson.venue}</p>
+                <p>${restJson.squad.length}</p>
+                <p>${restJson.website}</p>
+                <p>${restJson.email}</p>
+                <p>${restJson.phone}</p>
+                <p>${restJson.clubColors}</p>
+            </div>
+        </div>
+            `;
+            document.getElementById('content-modal').innerHTML = `<div class="row">${teams}</div>`;
+        });
 }
 
 function getListStandings() {
@@ -147,6 +202,8 @@ function loadPage(page) {
 document.addEventListener('DOMContentLoaded', function () {
     var elems = document.querySelectorAll('.sidenav');
     var instances = M.Sidenav.init(elems);
+
+
 
     document.querySelectorAll(".sidenav a, .topnav a").forEach(elm => {
         elm.addEventListener("click", evt => {
